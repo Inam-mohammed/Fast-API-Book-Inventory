@@ -26,7 +26,6 @@ def read_root():
 
 @app.post("/api/user/register", response_model=UserResponse)
 async def register_user(user_create: UserCreate, db: Session = Depends(get_db)):
-    # Your logic to register a user
     existing_user = db.query(DBUser).filter(DBUser.email == user_create.email).first()
     if existing_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
@@ -39,7 +38,6 @@ async def register_user(user_create: UserCreate, db: Session = Depends(get_db)):
 
 @app.post("/api/user/login", response_model=dict)
 async def login_user(user_credentials: UserLogin, db: Session = Depends(get_db)):
-    # Your logic to authenticate user
     user = db.query(DBUser).filter(DBUser.email == user_credentials.email, DBUser.password == user_credentials.password).first()
     print(user)
     if not user:
