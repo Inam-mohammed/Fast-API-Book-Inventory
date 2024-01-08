@@ -45,3 +45,13 @@ class Book(BookBase):
 
     class Config:
         orm_mode = True
+
+
+class BookResponse(BookBase):
+    message: str
+    book: BookBase
+    status: int
+
+
+class CategoryResponse(BaseModel):
+    title: str

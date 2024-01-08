@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from models import DBUser, DBBook
+from models import DBUser, DBBook, DBCategory
 from databases import engine, SessionLocal, Base
 from auth import is_admin, get_current_user, create_access_token
-from schemas import UserCreate, UserResponse, UserLogin, BookCreate, Book, BookBase
+from schemas import UserCreate, UserResponse, UserLogin, BookCreate, Book, BookBase, CategoryResponse
 from typing import List
 
 app = FastAPI()
@@ -52,6 +52,7 @@ async def login_user(user_credentials: UserLogin, db: Session = Depends(get_db))
 async def create_book(book_create: BookCreate, db: Session = Depends(get_db)):
     try:
         book = DBBook(**book_create.dict())
+        book = db.query(book_create)
         db.add(book)
         db.commit()
         db.refresh(book)
@@ -107,3 +108,13 @@ def delete_book(book_id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": "Book deleted successfully", "status_code": status.HTTP_200_OK}
+
+
+
+@app.post("/api/category", response_model=dict, dependencies=[Depends(get_current_user)])
+async def create_category(category: CategoryResponse, db: Session = Depends(get_db)):
+    category = DBCategory(**category.dict())
+    db.add(category)
+    db.commit()
+    db.refresh(category)
+    return category
